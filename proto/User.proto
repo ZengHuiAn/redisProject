@@ -1,0 +1,25 @@
+// 用户信息
+
+syntax = "proto3";
+service UserService {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    }
+}
+
+
+message UserData {
+     int32 UUID = 1; //用户ID
+     string userName = 2; // 用户名
+     int32 chatID = 3; //所在的房间
+}
+// 创建聊天室的请求
+message CreateUserRequest {
+    string userName = 1; // 昵称
+    string passwd = 2; //密码
+}
+
+// 创建聊天室的返回
+message CreateUserResponse {
+    int32 errorCode = 1; // 错误号
+    UserData userMessage = 2;
+}

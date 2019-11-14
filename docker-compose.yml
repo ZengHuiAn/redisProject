@@ -1,0 +1,21 @@
+# docker-compose.yml文件的版本
+version: "3"
+# 管理的服务
+services:
+  redis:
+    # 指定镜像
+    image: redis
+    ports:
+      # 端口映射
+      - 6379:6379
+    command:
+      # 执行的命令
+      redis-server
+
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 33060:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: snake123

@@ -1,0 +1,40 @@
+// 聊天 信息
+
+syntax = "proto3";
+service ChatService {
+    rpc CreateChat(CreateChatRequest) returns (CreateChatResponse) {}
+    rpc DropChat(DropChatRequest) returns (DropChatRequest) {}
+}
+
+// 创建聊天室的请求
+message CreateChatRequest {
+    int32  ChatMAX = 1;
+    string ChatName = 2;
+}
+
+// 创建聊天室的返回
+message CreateChatResponse {
+    int32 errorCode = 1; // 错误号
+    int32  ChatID = 2; // 房间ID
+}
+
+//删除聊天室请求
+message DropChatRequest {
+     int32  ChatID = 1; // 房间ID
+}
+
+// 删除聊天室返回
+message DropChatRequest {
+    int32 errorCode = 1; // 错误号
+}
+
+// 主动离开聊天室的请求
+message LeaveChatRequest {
+    int32  ChatID = 1; // 房间ID
+}
+
+// 主动离开聊天室的返回
+message LeaveChatRequest {
+    int32 errorCode = 1; // 错误号
+}
+

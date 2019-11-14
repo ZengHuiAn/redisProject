@@ -1,0 +1,1 @@
+docker run -d  -p 4001:4001 -p 7001:7001 -v /data/backup/dir:/data --name some-etcd elcolio/etcd:latest -name some-etcd  -discovery=https://discovery.etcd.io/blahblahblahblah  -advertise-client-urls http://192.168.1.99:4001  -initial-advertise-peer-urls http://192.168.1.99:7001
