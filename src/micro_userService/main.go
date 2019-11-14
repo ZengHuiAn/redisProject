@@ -1,12 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	micro "github.com/micro/go-micro"
-	User "redisProject/build/proto"
+	customProto "redisProject/build/proto"
 
 	"redisProject/src/business"
 )
+
+func ProcessEvent(ctx context.Context, event *customProto.Event) error {
+	fmt.Printf("Got event %+v\n", event)
+	return nil
+}
 
 func main() {
 	service := micro.NewService(
@@ -15,7 +21,9 @@ func main() {
 
 	service.Init()
 
-	User.RegisterUserServiceHandler(service.Server(), new(business.User))
+	customProto.RegisterUserServiceHandler(service.Server(), new(business.User))
+
+	micro.RegisterSubscriber("events",service.Server(), ProcessEvent)
 
 	// Run the server
 	if err := service.Run(); err != nil {

@@ -16,9 +16,8 @@ type User struct{}
 func (user *User) CreateUser(ctx context.Context, req *proUser.CreateUserRequest, rsp *proUser.CreateUserResponse) error {
 	result, err := tools.GetRedisClient().Get("userNames").Result()
 	fmt.Println("查询redis:\t", result, err, req)
+	rsp.ErrorCode = 200
+	rsp.UserMessage = &proUser.UserData{UserName: req.UserName, UUID: 1, ChatID: 0};
 
-	rsp = &proUser.CreateUserResponse{ErrorCode: 200,
-		UserMessage: &proUser.UserData{UserName: req.UserName, UUID: 1, ChatID: 0},
-	}
 	return nil
 }

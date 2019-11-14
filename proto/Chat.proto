@@ -1,6 +1,8 @@
 // 聊天 信息
 
 syntax = "proto3";
+package proto;
+
 service ChatService {
     rpc CreateChat(CreateChatRequest) returns (CreateChatResponse) {}
     rpc DropChat(DropChatRequest) returns (DropChatRequest) {}
@@ -24,7 +26,7 @@ message DropChatRequest {
 }
 
 // 删除聊天室返回
-message DropChatRequest {
+message DropChatResponse {
     int32 errorCode = 1; // 错误号
 }
 
@@ -34,7 +36,7 @@ message LeaveChatRequest {
 }
 
 // 主动离开聊天室的返回
-message LeaveChatRequest {
+message LeaveChatResponse {
     int32 errorCode = 1; // 错误号
 }
 

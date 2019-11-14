@@ -4,8 +4,13 @@ import (
 	"context"
 	"fmt"
 	micro "github.com/micro/go-micro"
-	proto "redisProject/build/proto"
+	customProto "redisProject/build/proto"
 )
+
+//func ProcessEvent(ctx context.Context, event *customProto.) error {
+//	fmt.Printf("Got event %+v\n", event)
+//	return nil
+//}
 
 func main() {
 	// Create a new service
@@ -14,10 +19,16 @@ func main() {
 	service.Init()
 
 	// Create new greeter client
-	userClient := proto.NewUserService("User", service.Client())
+	userClient := customProto.NewUserService("UserService", service.Client())
 
+	p := micro.NewPublisher("events", service.Client())
+	ctx :=context.TODO()
+
+	p.Publish(ctx,&customProto.Event{
+		Id:"11",
+	})
 	// Call the greeter
-	rsp, err := userClient.CreateUser(context.TODO(), &proto.CreateUserRequest{UserName:"snake",Passwd:"123"})
+	rsp, err := userClient.CreateUser(context.TODO(), &customProto.CreateUserRequest{UserName: "snake",Passwd:"123"})
 	if err != nil {
 		fmt.Println(err)
 	}

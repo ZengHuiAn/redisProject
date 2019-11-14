@@ -1,6 +1,8 @@
 // 用户信息
 
 syntax = "proto3";
+package proto;
+
 service UserService {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     }
