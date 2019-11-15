@@ -1,12 +1,12 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	micro "github.com/micro/go-micro"
-	customProto "redisProject/build/proto"
+"context"
+"fmt"
+micro "github.com/micro/go-micro"
+customProto "redisProject/build/proto"
 
-	"redisProject/src/business"
+"redisProject/src/business"
 )
 
 func ProcessEvent(ctx context.Context, event *customProto.Event) error {
