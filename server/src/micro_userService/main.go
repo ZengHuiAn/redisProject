@@ -4,11 +4,8 @@ import (
 "context"
 "fmt"
 micro "github.com/micro/go-micro"
-	"github.com/micro/go-micro/server"
-	customProto "redisProject/build/proto"
-	"time"
-
-	"redisProject/src/business"
+customProto "redisProject/build/proto"
+"redisProject/src/business"
 )
 
 func ProcessEvent(ctx context.Context, event *customProto.Event) error {
