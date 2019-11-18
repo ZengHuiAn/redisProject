@@ -143,7 +143,7 @@ public class NetPackData
         {
             var nullArray = new byte[1]
             {
-                1
+                (byte) EPackType.NULL,
             };
             return nullArray;
         }
@@ -199,7 +199,10 @@ public class NetPackData
                     break;
                 case EPackType.ARRAY:
                     var composeData = (Array)value;
-                    
+                    copyBytesArray(tempArray, new byte[1]
+                    {
+                        (byte) composeData.Length,
+                    });
                     for (int i = 0; i < composeData.Length; i++)
                     {
                         var itemValue = composeData.GetValue(i);

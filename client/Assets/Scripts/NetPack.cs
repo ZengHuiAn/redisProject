@@ -13,6 +13,7 @@ public static class NetPack
 public enum EPackType
 {
     UNDEFINED = 1, // 未定义
+    NULL = 100,
     BOOL = 101,
     CHAR = 102,
     BYTE = 103,

@@ -22,7 +22,7 @@ public class TestMSGPack : MonoBehaviour
         var bs = NetPackData.pack_all(obj);
 
 
-        LogTool.Instance.LogBytes(bs);
+//        .Instance.LogBytes(bs);
     }
     
 }
