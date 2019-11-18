@@ -73,8 +73,10 @@ func handleRequest(conn net.Conn) {
 			return
 		}
 
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", writerLen, headerBuf))
 
+		
+
+		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", writerLen, headerBuf))
 	}
 
 }
