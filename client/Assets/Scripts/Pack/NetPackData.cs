@@ -199,7 +199,7 @@ public class NetPackData
                     break;
                 case EPackType.ARRAY:
                     var composeData = (Array)value;
-                    copyBytesArray(tempArray, new byte[1]
+                    tempArray = copyBytesArray(tempArray, new byte[1]
                     {
                         (byte) composeData.Length,
                     });

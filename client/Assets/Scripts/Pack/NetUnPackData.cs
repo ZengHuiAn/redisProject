@@ -128,9 +128,17 @@ public class NetUnPackData
         return result.ToArray();
     }
 
+    public static object unpack_all(byte[] bytes)
+    {
+        return unpack_common(ref bytes);
+    }
+
     public static object unpack_common(ref byte[] bytes)
     {
-        var code = (EPackType) bytes[0];
+        byte pack_type =  (byte)unpack_Byte_data(ref bytes);
+
+        var code = (EPackType) pack_type;
+//        var code = (EPackType) unpack_Byte_data(ref bytes);
         object result;
         switch (code)
         {
@@ -175,8 +183,10 @@ public class NetUnPackData
                 break;
             case EPackType.ARRAY:
                 // 解的数组的长度
-                var arrayLen = (Int32) unpack_Byte_data(ref bytes);
+                byte by =  (byte)unpack_Byte_data(ref bytes);
 
+                var arrayLen = (Int32) by;
+                
                 var composeData = new object[arrayLen];
 
 
