@@ -15,42 +15,6 @@ public class NetPackData
         return int_bytes;
     }    
 
-    public static byte[] pack_char_data(char value)
-    {
-        byte[] int_bytes = new byte[]
-        {
-            (byte) value
-        };
-        
-        return int_bytes;
-    }    
-    
-
-    public static byte[] pack_Byte_data(byte value)
-    {
-        byte[] int_bytes = BitConverter.GetBytes(value);
-        
-        return int_bytes;
-    }    
-    
-    public static byte[] pack_int16_data(Int16 value)
-    {
-        byte[] int_bytes = BitConverter.GetBytes(value);
-        
-        return int_bytes;
-    }
-    
-    
-    
-    public static byte[] pack_uint16_data(UInt16 value)
-    {
-        byte[] int_bytes = BitConverter.GetBytes(value);
-        
-        return int_bytes;
-    }
-
-
-
     public static byte[] pack_int32_data(Int32 value)
     {
         byte[] int_bytes = BitConverter.GetBytes(value);
@@ -58,12 +22,6 @@ public class NetPackData
         return int_bytes;
     }
     
-    public static byte[] pack_uint32_data(UInt32 value)
-    {
-        byte[] int_bytes = BitConverter.GetBytes(value);
-        
-        return int_bytes;
-    }
     
     public static byte[] pack_int64_data(Int64 value)
     {
@@ -79,12 +37,6 @@ public class NetPackData
         return int_bytes;
     }
     
-    public static byte[] pack_float_data(float value)
-    {
-        byte[] int_bytes = BitConverter.GetBytes(value);
-        
-        return int_bytes;
-    }
     
     
     public static byte[] pack_double_data(double value)
@@ -113,16 +65,6 @@ public class NetPackData
         return len_bytes;
     }
     
-    public static byte[] pack_null_data(byte[] value)
-    {
-        byte[] int_bytes = new byte[1]
-        {
-            1
-        };
-        
-        return int_bytes;
-    }
-
 
     public static byte[] pack_all(object value)
     {
@@ -165,32 +107,18 @@ public class NetPackData
                     tempArray = pack_bool_data((bool) value);
                     break;
                 case EPackType.CHAR:
-                    tempArray = pack_char_data((char) value);
-                    break;
                 case EPackType.BYTE:
-                    tempArray = pack_Byte_data((byte) value);
-                    break;
                 case EPackType.INT16:
-                    tempArray = pack_int16_data((Int16) value);
-                    break;
-                case EPackType.UINT16:
-                    tempArray = pack_uint16_data((UInt16) value);
-                    break;
                 case EPackType.INT32:
-                    tempArray = pack_int32_data((Int32) value);
-                    break;
-                case EPackType.UINT32:
-                    tempArray = pack_uint32_data((UInt32) value);
-                    break;
                 case EPackType.INT64:
                     tempArray = pack_int64_data((Int64) value);
                     break;
+                case EPackType.UINT16:
+                case EPackType.UINT32:
                 case EPackType.UINT64:
                     tempArray = pack_uint64_data((UInt64) value);
                     break;
                 case EPackType.SINGLE:
-                    tempArray = pack_float_data((Single) value);
-                    break;
                 case EPackType.DOUBLE:
                     tempArray = pack_double_data((Double) value);
                     break;
@@ -202,10 +130,7 @@ public class NetPackData
                     break;
                 case EPackType.ARRAY:
                     var composeData = (Array)value;
-                    tempArray = copyBytesArray(tempArray, new byte[1]
-                    {
-                        (byte) composeData.Length,
-                    });
+                    tempArray = copyBytesArray(tempArray, pack_common(composeData.Length));
                     for (int i = 0; i < composeData.Length; i++)
                     {
                         var itemValue = composeData.GetValue(i);

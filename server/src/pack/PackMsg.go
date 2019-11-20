@@ -8,10 +8,8 @@ func Pack_bool_data(value bool) []byte {
 	return []byte{0}
 }
 
-func Pack_rune_data(value rune) []byte {
+// pack byte to do
 
-	return []byte{0}
-}
 
 func init() {
 	Pack_bool_data(true)

@@ -146,32 +146,18 @@ public class NetUnPackData
                 result = unpack_bool_data(ref bytes);
                 break;
             case EPackType.CHAR:
-                result = unpack_char_data(ref bytes);
-                break;
             case EPackType.BYTE:
-                result = unpack_Byte_data(ref bytes);
-                break;
             case EPackType.INT16:
-                result = unpack_int16_data(ref bytes);
-                break;
-            case EPackType.UINT16:
-                result = unpack_uint16_data(ref bytes);
-                break;
             case EPackType.INT32:
-                result = unpack_int32_data(ref bytes);
-                break;
-            case EPackType.UINT32:
-                result = unpack_uint32_data(ref bytes);
-                break;
             case EPackType.INT64:
                 result = unpack_int64_data(ref bytes);
                 break;
+            case EPackType.UINT16:
+            case EPackType.UINT32:
             case EPackType.UINT64:
                 result = unpack_uint64_data(ref bytes);
                 break;
             case EPackType.SINGLE:
-                result = unpack_float_data(ref bytes);
-                break;
             case EPackType.DOUBLE:
                 result = unpack_double_data(ref bytes);
                 break;
@@ -183,10 +169,8 @@ public class NetUnPackData
                 break;
             case EPackType.ARRAY:
                 // 解的数组的长度
-                byte by =  (byte)unpack_Byte_data(ref bytes);
+                var arrayLen =  (Int64)unpack_int64_data(ref bytes);
 
-                var arrayLen = (Int32) by;
-                
                 var composeData = new object[arrayLen];
 
 
