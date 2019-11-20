@@ -11,24 +11,11 @@ public class TestMSGPack : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var obj = new object[]
-        {
-            "1234",
-            9999,
-            5.1f,
-            Encoding.UTF8.GetBytes("123546"),
-            
-            new object[]
-            {
-                "1234",
-                9999,
-                5.1f,
-            },
-        };
+        var obj = true;
 //
         var bs = NetPackData.pack_all(obj);
         
-        
+        LogTool.Instance.ToStringAll(BitConverter.GetBytes(true));
         
         LogTool.Instance.ToStringAll(bs);
         
