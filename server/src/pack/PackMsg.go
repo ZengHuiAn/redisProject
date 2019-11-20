@@ -1,26 +1,16 @@
 package pack
 
-import (
-	"bytes"
-	"encoding/gob"
-	"fmt"
-	"log"
-)
-
 func Pack_bool_data(value bool) []byte {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(value)
-
-	if err !=nil {
-		log.Fatal(err)
+	if value == true {
+		return []byte{1}
 	}
 
-	data := buf.Bytes()
+	return []byte{0}
+}
 
-	fmt.Println(data)
+func Pack_rune_data(value rune) []byte {
 
-	return  data
+	return []byte{0}
 }
 
 func init() {
