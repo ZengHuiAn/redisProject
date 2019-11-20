@@ -12,16 +12,17 @@ public class TestMSGPack : MonoBehaviour
     void Start()
     {
         var obj = ('安');
+        LogTool.Instance.ToStringAll(BitConverter.GetBytes(Convert.ToInt32(obj)));
+
 //
-        var bs = NetPackData.pack_all(obj);
-        
-        LogTool.Instance.ToStringAll((byte)('a'));
-        LogTool.Instance.ToStringAll(BitConverter.GetBytes(false));
-        LogTool.Instance.ToStringAll(bs);
-        
-//        var obj_oo = NetUnPackData.unpack_all(bs);
+//        var bs = NetPackData.pack_all(obj);
+//        
+//        LogTool.Instance.ToStringAll((byte)('a'));
+//        LogTool.Instance.ToStringAll(BitConverter.GetBytes(false));
+//        LogTool.Instance.ToStringAll(bs);
+
+//        var obj_oo = NetUnPackData.unpack_all(bs); 
 //        LogTool.Instance.ToStringAll(obj_oo);
 //        .Instance.LogBytes(bs);
     }
-    
 }
