@@ -15,9 +15,8 @@ public class NetUnPackData
 
     public static object unpack_char_data(ref byte[] bytes)
     {
-        var result = BitConverter.ToChar(bytes, 0);
-        bytes = splice_Bytes(bytes, 1, bytes.Length);
-        return result;
+        var result = unpack_int32_data(ref bytes);
+        return Convert.ToChar(result);
     }
 
 

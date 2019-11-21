@@ -17,11 +17,8 @@ public class NetPackData
 
     public static byte[] pack_char_data(char value)
     {
-        byte[] int_bytes = new byte[]
-        {
-            (byte) value
-        };
-        
+        byte[] int_bytes = BitConverter.GetBytes(Convert.ToInt32(value));
+
         return int_bytes;
     }    
     
