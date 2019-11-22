@@ -161,9 +161,9 @@ public class NetPackData
                 case EPackType.BOOL:
                     tempArray = pack_bool_data((bool) value);
                     break;
-                case EPackType.CHAR:
-                    tempArray = pack_char_data((char) value);
-                    break;
+//                case EPackType.CHAR:
+//                    tempArray = pack_char_data((char) value);
+//                    break;
                 case EPackType.BYTE:
                     tempArray = pack_Byte_data((byte) value);
                     break;
