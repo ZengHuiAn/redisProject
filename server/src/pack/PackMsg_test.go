@@ -18,5 +18,5 @@ func TestPack_bool_data(t *testing.T) {
 
 	var test = Pack_common(arr)
 	t.Log(test)
-	//t.Log( UNPack_common(test))
+	t.Log( UNPack_common(test))
 }

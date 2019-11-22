@@ -3,6 +3,7 @@ package pack
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"unsafe"
 )
 
@@ -56,7 +57,7 @@ func UnPack_uint16_data(bts []byte) ([]byte, uint16) {
 func UnPack_int32_data(bts []byte) ([]byte, int32) {
 
 	var value int32
-	var buffer = bytes.NewBuffer([]byte{})
+	var buffer = bytes.NewBuffer(bts)
 	err := binary.Read(buffer, binary.LittleEndian, &value)
 	if err != nil {
 		panic(err)
@@ -68,7 +69,7 @@ func UnPack_int32_data(bts []byte) ([]byte, int32) {
 func UnPack_uint32_data(bts []byte) ([]byte, uint32) {
 
 	var value uint32
-	var buffer = bytes.NewBuffer([]byte{})
+	var buffer = bytes.NewBuffer(bts)
 	err := binary.Read(buffer, binary.LittleEndian, &value)
 	if err != nil {
 		panic(err)
@@ -80,7 +81,7 @@ func UnPack_uint32_data(bts []byte) ([]byte, uint32) {
 func UnPack_int64_data(bts []byte) ([]byte, int64) {
 
 	var value int64
-	var buffer = bytes.NewBuffer([]byte{})
+	var buffer = bytes.NewBuffer(bts)
 	err := binary.Read(buffer, binary.LittleEndian, &value)
 	if err != nil {
 		panic(err)
@@ -92,7 +93,7 @@ func UnPack_int64_data(bts []byte) ([]byte, int64) {
 func UnPack_uint64_data(bts []byte) ([]byte, uint64) {
 
 	var value uint64
-	var buffer = bytes.NewBuffer([]byte{})
+	var buffer = bytes.NewBuffer(bts)
 	err := binary.Read(buffer, binary.LittleEndian, &value)
 	if err != nil {
 		panic(err)
@@ -104,7 +105,7 @@ func UnPack_uint64_data(bts []byte) ([]byte, uint64) {
 func UnPack_float_data(bts []byte) ([]byte, float32) {
 
 	var value float32
-	var buffer = bytes.NewBuffer([]byte{})
+	var buffer = bytes.NewBuffer(bts)
 	err := binary.Read(buffer, binary.LittleEndian, &value)
 	if err != nil {
 		panic(err)
@@ -116,7 +117,7 @@ func UnPack_float_data(bts []byte) ([]byte, float32) {
 func UnPack_double_data(bts []byte) ([]byte, float64) {
 
 	var value float64
-	var buffer = bytes.NewBuffer([]byte{})
+	var buffer = bytes.NewBuffer(bts)
 	err := binary.Read(buffer, binary.LittleEndian, &value)
 	if err != nil {
 		panic(err)
@@ -151,7 +152,11 @@ func UNPack_common(bts []byte) ([]byte, interface{}) {
 	var new_bytes, pack_type = UnPack_Byte_data(bts)
 	var result interface{}
 	var result_bytes []byte
+	fmt.Println(EPackType(pack_type))
 	switch EPackType(pack_type) {
+	case NULL:
+		result = nil
+		result_bytes = new_bytes
 	case BOOL:
 		result_bytes, result = UnPack_bool_data(new_bytes)
 	case BYTE:

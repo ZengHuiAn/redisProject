@@ -18,6 +18,5 @@ func (T TCPStruct) GetHost() string {
 	if T.Host == "" {
 		T.Host = "0.0.0.0"
 	}
-
 	return T.Host
 }

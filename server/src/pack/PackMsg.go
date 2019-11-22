@@ -156,8 +156,20 @@ func Pack_common(value interface{}) []byte {
 	case UINT16:
 		tempArray = Pack_uint16_data(value.(uint16))
 	case INT32:
-		tempArray = Pack_int32_data(value.(int32))
+		switch value.(type) {
+		case int:
+			tempArray = Pack_int32_data(int32(value.(int)))
+		case int32:
+			tempArray = Pack_int32_data(value.(int32))
+		}
+
 	case UINT32:
+		switch value.(type) {
+		case uint:
+			tempArray = Pack_uint32_data(uint32(value.(uint)))
+		case uint32:
+			tempArray = Pack_uint32_data(value.(uint32))
+		}
 		tempArray = Pack_uint32_data(value.(uint32))
 	case INT64:
 		tempArray = Pack_int64_data(value.(int64))
@@ -180,7 +192,7 @@ func Pack_common(value interface{}) []byte {
 
 		for i := 0; i < tempValue.Len(); i++ {
 			var itemValue = tempValue.Index(i)
-			var item_bytes = Pack_common(itemValue)
+			var item_bytes = Pack_common(itemValue.Interface())
 			tempArray = append(tempArray, item_bytes...)
 		}
 	default:

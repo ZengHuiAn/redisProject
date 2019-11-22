@@ -37,7 +37,7 @@ func GetReflectCode(p interface{}) EPackType {
 
 func GetCodeAtCode(p reflect.Value) EPackType {
 
-	fmt.Println(p.Interface())
+	fmt.Println(p.Kind(),reflect.TypeOf(p.Kind()))
 	var kind = p.Kind()
 	switch kind {
 	case reflect.Bool:
@@ -50,12 +50,20 @@ func GetCodeAtCode(p reflect.Value) EPackType {
 		return UINT16
 	case reflect.Int32:
 		return INT32
+	case reflect.Int:
+		return INT32
 	case reflect.Uint32:
+		return UINT32
+	case reflect.Uint:
 		return UINT32
 	case reflect.Int64:
 		return INT64
 	case reflect.Uint64:
 		return UINT64
+	case reflect.Float32:
+		return SINGLE
+	case reflect.Float64:
+		return  DOUBLE
 	case reflect.String:
 		return STRING
 	default:
