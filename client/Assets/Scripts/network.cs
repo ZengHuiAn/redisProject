@@ -11,10 +11,15 @@ public class network : MonoBehaviour
     public Socket client;
     public string server_ip;
     public int port;
-
+    private const int RECV_LEN = 8192;
     private Thread readThread;
+    private int receved = 0;
     private bool is_Connect  = false;
-    private byte[] recv_buffer = new byte[8296];
+    private byte[] recv_buffer = new byte[RECV_LEN];
+
+    private byte[] long_pkg = null;
+    private Action<byte[]> on_recv_tcp_data;
+    private int long_pkg_size = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -81,12 +86,31 @@ public class network : MonoBehaviour
 
             try
             {
-                int recv_len = this.client.Receive(this.recv_buffer);
+                int recv_len = 0;
+                // small
+                if (this.receved < RECV_LEN)
+                {
+                    recv_len = this.client.Receive(this.recv_buffer,this.receved,RECV_LEN - this.receved,SocketFlags.None); 
+                }
+                else
+                {
+                    if (this.long_pkg == null)
+                    {
+                        var out_header = new byte[PackTools.PACK_LENGTH];
+                        Array.Copy(this.recv_buffer,out_header,out_header.Length);
+                        ClientHeader header = PackTools.UnPackObject(out_header);
+                        this.long_pkg_size = Convert.ToInt32(header.Length);
+                        this.long_pkg = new byte[header.Length];
+                        //将上次的数据拷贝到这次的大包数组里
+                        Array.Copy(this.recv_buffer,0,this.long_pkg,0,this.receved);
+                    }
+                    recv_len = this.client.Receive(this.recv_buffer,this.receved,RECV_LEN - this.receved,SocketFlags.None); 
+                }
 
-                // 接受数据
                 if (recv_len >0)
                 {
-                    
+                    this.receved += recv_len;
+                    tcp_Func();
                 }
             }
             catch (Exception e)
@@ -97,6 +121,66 @@ public class network : MonoBehaviour
 
         }
     }
+
+    void tcp_Func()
+    {
+        var tcp_data = this.long_pkg != null ? this.long_pkg : this.recv_buffer;
+
+
+        while (this.receved >0)
+        {
+            ClientHeader header;
+            try
+            {
+                var out_header = new byte[PackTools.PACK_LENGTH];
+                Array.Copy(tcp_data,out_header,out_header.Length);
+                 header = PackTools.UnPackObject(out_header);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
+                break;
+            }
+            if (this.receved < header.Length)
+            {
+                break;
+            }
+
+            int pkgSize = Convert.ToInt32(header.Length);
+            int raw_data_start = PackTools.PACK_LENGTH;
+            int raw_data_len = pkgSize - PackTools.PACK_LENGTH;
+            this.on_recv_tcp_cmd(tcp_data, raw_data_start, raw_data_len);
+
+            if (this.receved > pkgSize)
+            {
+                this.recv_buffer = new byte[RECV_LEN];
+                Array.Copy(tcp_data,pkgSize,this.recv_buffer,0,this.receved-pkgSize);
+            }
+
+            this.receved -= pkgSize;
+            if (this.receved == 0 && this.long_pkg !=null)
+            {
+                this.long_pkg = null;
+                this.long_pkg_size = 0;
+            }
+        }
+
+        
+    }
+
+    void on_recv_tcp_cmd(byte[] tcp_data ,int start,int data_len)
+    {
+        var out_header = new byte[PackTools.PACK_LENGTH];
+        Array.Copy(tcp_data,out_header,out_header.Length);
+        var header = PackTools.UnPackObject(out_header);
+
+        var out_msg = new byte[data_len];
+        Array.Copy(tcp_data,start,out_msg,0,data_len);
+        
+        SMessage message = new SMessage(header,out_msg);
+    }
+    
+    
 
     void close()
     {

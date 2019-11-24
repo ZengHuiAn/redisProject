@@ -7,7 +7,7 @@ type TCPClientHeader struct {
 	ProtoType uint32
 }
 
-const ClientClientHeaderLength = 12
+const ClientClientHeaderLength = 16
 
 func MakeHeader(msgID uint32) TCPClientHeader {
 	return TCPClientHeader{MessageID: msgID, Flag: 1}

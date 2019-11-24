@@ -21,7 +21,16 @@ public class TestMSGPack : MonoBehaviour
 //                '%'
 //            },
 //        };
-        LogTool.Instance.ToStringAll(BitConverter.GetBytes((Int16)(50)));
+        LogTool.Instance.ToStringAll(BitConverter.GetBytes((Int16) (50)));
+        ClientHeader header = new ClientHeader();
+        SerializableStructAttribute[] objects =
+            (SerializableStructAttribute[]) header.GetType()
+                .GetCustomAttributes(typeof(SerializableStructAttribute), false);
+
+        foreach (var VARIABLE in objects)
+        {
+            Debug.Log(VARIABLE);
+        }
 
 //
 //        var bs = NetPackData.pack_all(obj);
@@ -34,4 +43,7 @@ public class TestMSGPack : MonoBehaviour
 //        LogTool.Instance.ToStringAll(obj_oo);
 //        .Instance.LogBytes(bs);
     }
+
+
 }
+
