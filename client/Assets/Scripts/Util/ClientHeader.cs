@@ -28,13 +28,18 @@ public struct ClientHeader : IPackVlue
 
         return list.ToArray();
     }
+
+    public override string ToString()
+    {
+        return $"Length:{Length}  Flag:{Flag}  MessageID:{MessageID}  ProtoType:{ProtoType}";
+    }
 }
 
 [UsedImplicitly]
 public class SMessage
 {
     public ClientHeader Header;
-    public byte[] message;
+    public byte[] message ;
 
 
     private object content;
@@ -45,7 +50,7 @@ public class SMessage
         {
             if (content == null)
             {
-                if (message !=null)
+                if (message !=null && message.Length !=0)
                 {
                     this.content = NetUnPackData.unpack_all(this.message);
                 }

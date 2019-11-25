@@ -13,23 +13,39 @@ public class network : MonoBehaviour
     public int port;
     private const int RECV_LEN = 8192;
     private Thread readThread;
+    private Thread sendThread;
     private int receved = 0;
     private bool is_Connect  = false;
     private byte[] recv_buffer = new byte[RECV_LEN];
 
     private byte[] long_pkg = null;
-    private Action<byte[]> on_recv_tcp_data;
+    private Action<SMessage> on_recv_tcp_data;
     private int long_pkg_size = 0;
+    private Queue<byte[]> sendQueue = new Queue<byte[]>();
     // Start is called before the first frame update
     void Start()
     {
+        EventManager.Instance.AddEventAction("OnLogin",onLogin);
+        this.on_recv_tcp_data = message =>
+        {
+            LogTool.Instance.ToStringAll(message.Header);
+        };
         connect2Server();
+    }
+
+
+    void onLogin(object data)
+    {
+        Debug.Log("data,login------------>>>");
+        
+        EventManager.Instance.RemoveEventAction("OnLogin",onLogin);
+        print("----------->>>>");
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     private void OnDestroy()
@@ -70,6 +86,19 @@ public class network : MonoBehaviour
         Debug.Log(msg);
     }
 
+    public void start_send_data(ClientHeader header,byte[] body)
+    {
+        if (this.is_Connect == false)
+        {
+            return;
+        }
+        
+        if (!this.client.Connected)
+        {
+            return;
+        }
+    }
+
     void start_recv_data()
     {
         if (this.is_Connect == false)
@@ -86,6 +115,7 @@ public class network : MonoBehaviour
 
             try
             {
+                Debug.Log("读取数据中...");
                 int recv_len = 0;
                 // small
                 if (this.receved < RECV_LEN)
@@ -115,7 +145,44 @@ public class network : MonoBehaviour
             }
             catch (Exception e)
             {
-                
+                Debug.Log(e.Message);
+                break;
+            }
+
+        }
+    }
+
+    void start_tcp_send_data()
+    {
+        if (this.is_Connect == false)
+        {
+            return;
+        }
+
+        while (true)
+        {
+            if (!this.client.Connected)
+            {
+                break;
+            }
+
+            try
+            {
+                List<byte> buffer = new List<byte>();
+                while (this.sendQueue.Count != 0)
+                {
+                    var sendBuffer = this.sendQueue.Peek();
+                    if (buffer.Count + sendBuffer.Length > RECV_LEN)
+                    {
+                        break;
+                    }
+                    buffer.AddRange(sendBuffer);
+                    this.sendQueue.Dequeue();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
                 break;
             }
 
@@ -178,6 +245,7 @@ public class network : MonoBehaviour
         Array.Copy(tcp_data,start,out_msg,0,data_len);
         
         SMessage message = new SMessage(header,out_msg);
+        on_recv_tcp_data(message);
     }
     
     
@@ -215,8 +283,13 @@ public class network : MonoBehaviour
                 this.readThread.Abort();
             }
             this.is_Connect = true;
+            EventManager.Instance.Call("OnLogin",null);
             this.readThread = new Thread(new ThreadStart(this.start_recv_data));
             this.readThread.Start();
+            this.sendThread = new Thread(new ThreadStart(this.start_tcp_send_data));
+            this.sendThread.Start();
+            
+           
         }
         catch (Exception e)
         {

@@ -44,6 +44,11 @@ public class TestMSGPack : MonoBehaviour
 //        .Instance.LogBytes(bs);
     }
 
+    public void testEvent()
+    {
+        EventManager.Instance.Call("OnLogin",null);
+    }
+
 
 }
 

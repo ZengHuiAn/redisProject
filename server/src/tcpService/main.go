@@ -2,12 +2,15 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
 	"redisProject/src/net_struct"
+	"redisProject/src/pack"
 	"strconv"
 )
 
@@ -45,6 +48,24 @@ func main() {
 
 }
 
+func testWriter(writer *bufio.Writer)  {
+	var header net_struct.TCPClientHeader = net_struct.TCPClientHeader{Length:net_struct.ClientClientHeaderLength,Flag:1,MessageID:101,ProtoType:1}
+	var buffer = bytes.NewBuffer([]byte{})
+	err:= binary.Write(buffer,binary.LittleEndian,header)
+	if err != nil {
+		log.Println("writer error ", err)
+		return
+	}
+
+	_, err = writer.Write(buffer.Bytes())
+	_ = writer.Flush()
+	if err != nil {
+		log.Println("writer error ", err)
+		return
+	}
+	fmt.Println("发送数据")
+}
+
 func handleRequest(conn net.Conn) {
 	ip := conn.RemoteAddr().String()
 
@@ -53,11 +74,13 @@ func handleRequest(conn net.Conn) {
 		conn.Close()
 	}()
 
+
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 
+	testWriter(writer)
 	for {
-		headerBuf := make([]byte, 4)
+		headerBuf := make([]byte, net_struct.ClientClientHeaderLength)
 		fmt.Println("读取数据---------->>>>",ip)
 		readLen, err := reader.Read(headerBuf)
 		if err!=nil || err == io.EOF {
@@ -65,18 +88,36 @@ func handleRequest(conn net.Conn) {
 			break
 		}
 
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", readLen, headerBuf))
-		writerLen, err := writer.Write(headerBuf)
-		_ = writer.Flush()
-		if err != nil {
-			log.Println("writer error ", err)
-			return
+
+		var buffer  = bytes.NewBuffer(headerBuf)
+		var header net_struct.TCPClientHeader
+		err = binary.Read(buffer, binary.LittleEndian, header)
+
+		if err!=nil  {
+			log.Println("read buffer error ", err)
+			break
 		}
+		dataBuffer := make([]byte, header.Length);
+		readLen, err = reader.Read(dataBuffer)
+
+		if err!=nil || err == io.EOF {
+			log.Println("read error ", err)
+			break
+		}
+		var packData = pack.Encode(dataBuffer)
+		fmt.Println("read data :",packData)
+		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", readLen, headerBuf))
+		//writerLen, err := writer.Write(headerBuf)
+		//_ = writer.Flush()
+		//if err != nil {
+		//	log.Println("writer error ", err)
+		//	return
+		//}
 
 
 		
 
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", writerLen, headerBuf))
+		//fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", writerLen, headerBuf))
 	}
 
 }
