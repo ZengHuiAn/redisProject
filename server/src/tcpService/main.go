@@ -91,33 +91,26 @@ func handleRequest(conn net.Conn) {
 
 		var buffer  = bytes.NewBuffer(headerBuf)
 		var header net_struct.TCPClientHeader
-		err = binary.Read(buffer, binary.LittleEndian, header)
+		err = binary.Read(buffer, binary.LittleEndian, &header)
 
 		if err!=nil  {
 			log.Println("read buffer error ", err)
 			break
 		}
-		dataBuffer := make([]byte, header.Length);
+
+		fmt.Println("read data :",header)
+		dataBuffer := make([]byte, header.Length - net_struct.ClientClientHeaderLength);
 		readLen, err = reader.Read(dataBuffer)
 
 		if err!=nil || err == io.EOF {
 			log.Println("read error ", err)
 			break
 		}
+
+		fmt.Println("read data :",dataBuffer)
 		var packData = pack.Encode(dataBuffer)
 		fmt.Println("read data :",packData)
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", readLen, headerBuf))
-		//writerLen, err := writer.Write(headerBuf)
-		//_ = writer.Flush()
-		//if err != nil {
-		//	log.Println("writer error ", err)
-		//	return
-		//}
-
-
-		
-
-		//fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", writerLen, headerBuf))
+		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %v", readLen, dataBuffer))
 	}
 
 }

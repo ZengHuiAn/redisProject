@@ -12,3 +12,14 @@ const ClientClientHeaderLength = 16
 func MakeHeader(msgID uint32) TCPClientHeader {
 	return TCPClientHeader{MessageID: msgID, Flag: 1}
 }
+
+
+
+type TCPServerData struct {
+	Header TCPClientHeader // 头部信息
+	body []byte
+}
+
+func (SELF* TCPServerData)GetBody() []byte  {
+	return SELF.body
+}
