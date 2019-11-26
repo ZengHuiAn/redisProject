@@ -50,5 +50,25 @@ public class TestMSGPack : MonoBehaviour
     }
 
 
+    public void sendNetData()
+    {
+
+        var obj = new object[]
+        {
+            5,5.5,6
+        };
+        var buffer =  NetPackData.pack_all(obj);
+
+        var header = new ClientHeader()
+        {
+            Length = Convert.ToUInt32(PackTools.PACK_LENGTH) + Convert.ToUInt32(buffer.Length),
+            Flag = 2,
+            MessageID = 101,
+            ProtoType = 1,
+        };
+        
+        network.instance.start_send_data(header,buffer);
+    }
+
 }
 
