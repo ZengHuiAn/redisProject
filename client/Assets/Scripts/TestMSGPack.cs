@@ -44,6 +44,8 @@ public class TestMSGPack : MonoBehaviour
 //        .Instance.LogBytes(bs);
     }
 
+    public UnityEngine.UI.InputField[] InputFields;
+
     public void testEvent()
     {
         EventManager.Instance.Call("OnLogin",null);
@@ -55,7 +57,8 @@ public class TestMSGPack : MonoBehaviour
 
         var obj = new object[]
         {
-            5,5.5,6
+            InputFields[0].text,
+            InputFields[1].text
         };
         var buffer =  NetPackData.pack_all(obj);
 

@@ -24,10 +24,11 @@ public class network : MonoBehaviour
     private int long_pkg_size = 0;
 
     private Queue<byte[]> sendQueue = new Queue<byte[]>();
+    private Queue<SMessage> readQueue = new Queue<SMessage>();
 
 
     public static network instance;
-    
+
     private void Awake()
     {
         instance = this;
@@ -54,6 +55,17 @@ public class network : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (this.readQueue.Count == 0)
+        {
+            return;
+        }
+
+        SMessage sMessage = this.readQueue.Dequeue();
+        if (sMessage != null)
+        {
+            EventManager.Instance.Call("EVENT.NET.MESSAGE", sMessage);
+        }
+        
     }
 
     private void OnDestroy()
@@ -108,7 +120,7 @@ public class network : MonoBehaviour
 
         var data = PackTools.PackObject(header);
         List<byte> buffer = new List<byte>(data);
-        
+
         buffer.AddRange(body);
         this.sendQueue.Enqueue(buffer.ToArray());
     }
@@ -163,19 +175,21 @@ public class network : MonoBehaviour
             catch (Exception e)
             {
                 Debug.Log(e.Message);
+                EventManager.Instance.Call("EVENT.NET.CLOSE",null);
                 break;
             }
         }
     }
 
     private byte[] sendBuffer;
+
     void start_tcp_send_data()
     {
         if (this.is_Connect == false)
         {
             return;
         }
-        
+
         while (true)
         {
             if (!this.client.Connected)
@@ -185,10 +199,8 @@ public class network : MonoBehaviour
 
             try
             {
-
                 if (this.sendQueue.Count == 0)
                 {
-                    
                 }
                 else
                 {
@@ -205,9 +217,10 @@ public class network : MonoBehaviour
                         buffer.AddRange(sendBuffer);
                         this.sendQueue.Dequeue();
                     }
-                
+
                     this.sendBuffer = buffer.ToArray();
-                    IAsyncResult ar = this.client.BeginSend(this.sendBuffer,0,this.sendBuffer.Length,  SocketFlags.None,new AsyncCallback(this.on_send_end), this.client);
+                    IAsyncResult ar = this.client.BeginSend(this.sendBuffer, 0, this.sendBuffer.Length,
+                        SocketFlags.None, new AsyncCallback(this.on_send_end), this.client);
                     ar.AsyncWaitHandle.WaitOne(1000);
                 }
             }
@@ -288,7 +301,7 @@ public class network : MonoBehaviour
         Array.Copy(tcp_data, start, out_msg, 0, data_len);
 
         SMessage message = new SMessage(header, out_msg);
-        on_recv_tcp_data(message);
+        this.readQueue.Enqueue(message);
     }
 
 
