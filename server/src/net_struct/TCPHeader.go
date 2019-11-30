@@ -14,12 +14,26 @@ func MakeHeader(msgID uint32) TCPClientHeader {
 }
 
 
-
-type TCPServerData struct {
+type TCPClientData struct {
 	Header TCPClientHeader // 头部信息
 	body []byte
 }
 
+
+
+type TCPServerTargetAddr struct {
+	fromServer string
+	toServer string
+}
+
+
+
+
+type TCPServerData struct {
+	Target TCPServerTargetAddr
+	ClientData TCPClientData
+}
+
 func (SELF* TCPServerData)GetBody() []byte  {
-	return SELF.body
+	return SELF.ClientData.body
 }
