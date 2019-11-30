@@ -33,7 +33,11 @@ func main() {
 		return
 	}
 
+
 	defer listener.Close()
+
+
+
 	fmt.Println(fmt.Sprintf("ProtocolType %s, addr %s", listener.Addr().Network(), listener.Addr().String()))
 	for {
 		conn, err := listener.Accept()

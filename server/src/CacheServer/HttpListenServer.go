@@ -14,6 +14,8 @@ type HttpListenServer struct {
 func  CreateHttpListenServer() *HttpListenServer {
 	server := &HttpListenServer{}
 	server.routerEngine = gin.Default()
+
+	println("create success HttpListenServer ... ")
 	return server
 }
 /*
@@ -33,13 +35,15 @@ func (server *HttpListenServer) StaticMethod(methodName string, router string ,h
 }
 
 func (server *HttpListenServer) Run(host string, port string) {
-	server.routerEngine = gin.Default()
-	server.routerEngine.GET("/ping", func(c *gin.Context) {
+	server.StaticMethod("GET","/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
 
 	addr := host + ":" + port
+	println( "HttpListenServer  running ",addr)
 	_ = server.routerEngine.Run(addr) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+
+
 }
