@@ -1,16 +1,16 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
-	"encoding/binary"
+	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
+	"redisProject/src/eventManager"
 	"redisProject/src/net_struct"
 	"redisProject/src/pack"
+	"redisProject/src/static/res"
+	"redisProject/src/tcpService/client"
 	"strconv"
 )
 
@@ -24,7 +24,6 @@ var s_instance = net_struct.ServerInstance{
 }
 
 func main() {
-
 	fmt.Println(s_instance.Config.GetHost() + ":" + strconv.Itoa(s_instance.Config.Port))
 	var listener, err = net.Listen(s_instance.Config.ProtocolType, s_instance.Config.GetHost()+":"+strconv.Itoa(s_instance.Config.Port))
 
@@ -36,8 +35,16 @@ func main() {
 
 	defer listener.Close()
 
+	
 
-
+	eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).AddProtoEventAction(res.PROTOCOL_C2S,101,&eventManager.Event{Action: func(args interface{}) {
+		fmt.Println("收到客户端数据----->>>",pack.Encode(args.(*net_struct.TCPClientData).GetBody()))
+	}})
+	connectManager := client.GetManagerForName(res.CONNECT_MGR_Name)
+	connectManager.RegisterMiddle(func(msgName string, msgID uint32, data *net_struct.TCPClientData) (b bool, e error) {
+		return false, errors.New("测试错误------>>>")
+	})
+	go connectManager.Run()
 	fmt.Println(fmt.Sprintf("ProtocolType %s, addr %s", listener.Addr().Network(), listener.Addr().String()))
 	for {
 		conn, err := listener.Accept()
@@ -47,74 +54,11 @@ func main() {
 		}
 
 		fmt.Println(fmt.Sprintf("message %s -> %s", conn.RemoteAddr(), conn.LocalAddr()))
-		go handleRequest(conn)
+		client := client.NewCustomClient(connectManager.Name(),conn)
+		connectManager.RegisterClient(client)
 	}
 
 }
 
-func testWriter(writer *bufio.Writer)  {
-	var header net_struct.TCPClientHeader = net_struct.TCPClientHeader{Length:net_struct.ClientClientHeaderLength,Flag:1,MessageID:101,ProtoType:1}
-	var buffer = bytes.NewBuffer([]byte{})
-	err:= binary.Write(buffer,binary.LittleEndian,header)
-	if err != nil {
-		log.Println("writer error ", err)
-		return
-	}
-
-	_, err = writer.Write(buffer.Bytes())
-	_ = writer.Flush()
-	if err != nil {
-		log.Println("writer error ", err)
-		return
-	}
-	fmt.Println("发送数据")
-}
-
-func handleRequest(conn net.Conn) {
-	ip := conn.RemoteAddr().String()
-
-	defer func() {
-		fmt.Println(fmt.Sprintf("disconnect: %s", ip))
-		conn.Close()
-	}()
 
 
-	reader := bufio.NewReader(conn)
-	writer := bufio.NewWriter(conn)
-
-	testWriter(writer)
-	for {
-		headerBuf := make([]byte, net_struct.ClientClientHeaderLength)
-		fmt.Println("读取数据---------->>>>",ip)
-		readLen, err := reader.Read(headerBuf)
-		if err!=nil || err == io.EOF {
-			log.Println("read error ", err)
-			break
-		}
-
-
-		var buffer  = bytes.NewBuffer(headerBuf)
-		var header net_struct.TCPClientHeader
-		err = binary.Read(buffer, binary.LittleEndian, &header)
-
-		if err!=nil  {
-			log.Println("read buffer error ", err)
-			break
-		}
-
-		fmt.Println("read data :",header)
-		dataBuffer := make([]byte, header.Length - net_struct.ClientClientHeaderLength);
-		readLen, err = reader.Read(dataBuffer)
-
-		if err!=nil || err == io.EOF {
-			log.Println("read error ", err)
-			break
-		}
-
-		fmt.Println("read data :",dataBuffer)
-		var packData = pack.Encode(dataBuffer)
-		fmt.Println("read data :",packData)
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %v", readLen, dataBuffer))
-	}
-
-}

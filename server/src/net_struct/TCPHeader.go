@@ -19,6 +19,12 @@ type TCPClientData struct {
 	body []byte
 }
 
+func NewTCPClientData(header TCPClientHeader, body []byte) *TCPClientData {
+	return &TCPClientData{Header: header, body: body}
+}
+func (SELF* TCPClientData)GetBody() []byte  {
+	return SELF.body
+}
 
 
 type TCPServerTargetAddr struct {
@@ -34,6 +40,3 @@ type TCPServerData struct {
 	ClientData TCPClientData
 }
 
-func (SELF* TCPServerData)GetBody() []byte  {
-	return SELF.ClientData.body
-}

@@ -10,6 +10,12 @@ import (
 	"redisProject/src/static/res"
 )
 
+var cacheMapClient map[string] *CacheServer.MicroserviceAddr
+
+func initMap()  {
+	cacheMapClient = make(map[string] *CacheServer.MicroserviceAddr)
+}
+
 func RegisterService()  {
 	var server = GetGateWayRegisterService()
 	server.StaticMethod("POST",res.ServiceRouter, func(c *gin.Context) {
@@ -26,6 +32,31 @@ func RegisterService()  {
 			})
 			return
 		}
+
+		if cacheMapClient[addr.Name] != nil {
+			fmt.Println("err ---->> 重复注册",addr)
+
+			c.JSON(http.StatusAlreadyReported, gin.H{
+				"message": "你已经注册过了",
+			})
+			return
+		}
+		cacheMapClient[addr.Name] = &addr
+		c.JSON(200, gin.H{
+			"message": "对喽",
+		})
+	})
+}
+
+func DeletedService()  {
+	var server = GetGateWayRegisterService()
+	server.StaticMethod("DET",res.ServiceRouter, func(c *gin.Context) {
+		//var buffer [] byte
+		//io.ReadFull(c.Request.Body,buffer)
+		var result = GetResponeBody(c.Request.Body)
+
+		fmt.Println(result)
+
 		c.JSON(200, gin.H{
 			"message": "对喽",
 		})
@@ -34,6 +65,8 @@ func RegisterService()  {
 
 
 func init()  {
+	initMap()
 	fmt.Println("service register")
 	RegisterService()
+	DeletedService()
 }

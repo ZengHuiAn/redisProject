@@ -17,5 +17,7 @@ func main() {
 	}
 	var resp = gatewayRegistService.RegisterGateWayServer(selfAddr)
 
+	//gatewayRegistService
+
 	fmt.Println(resp.Body)
 }
