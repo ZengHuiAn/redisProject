@@ -8,6 +8,10 @@ var (
 	BaseRouterURL = "http://127.0.0.1:28080"
 )
 
+const (
+	LOGIN_C2S = 101
+)
+
 //第一版TCP Static Name
 
 var (

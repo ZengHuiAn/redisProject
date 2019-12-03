@@ -20,8 +20,10 @@ type ConnectManager struct {
 	// 断开连接chanel
 	disConnectChan chan string
 	name           string
-	middleWareFunc func(msgName string, msgID uint32, data *net_struct.TCPClientData) (bool, error)
+	middleWareFunc func(msgName string, ip string, msgID uint32, data *net_struct.TCPClientData) (bool, error)
 	onMsgChan      chan common.Message
+
+	onLocalMsgChan chan common.Message
 }
 
 func defaultMiddleFunc(msgName string, msgID uint32, data *net_struct.TCPClientData) (bool, error) {
@@ -35,7 +37,7 @@ func MakeConnectManager(name string) *ConnectManager {
 	return manager
 }
 
-func (manager *ConnectManager) RegisterMiddle(middle func(msgName string, msgID uint32, data *net_struct.TCPClientData) (bool, error)) {
+func (manager *ConnectManager) RegisterMiddle(middle func(msgName string, ip string, msgID uint32, data *net_struct.TCPClientData) (bool, error)) {
 	manager.middleWareFunc = middle
 }
 
@@ -104,10 +106,23 @@ func (manager *ConnectManager) addItemClient(itemClient *CustomClient) {
 	manager.clients[name].OnConnect()
 }
 
+func (manager *ConnectManager) ReceiveLocalMsgMany(clients []string, data net_struct.TCPClientData) {
+	for _, v := range clients {
+		manager.ReceiveLocalMsgDone(v, data)
+	}
+}
+
+//接收本地发送方法---------->>>>
+func (manager *ConnectManager) ReceiveLocalMsgDone(client string, data net_struct.TCPClientData) {
+	manager.onLocalMsgChan <- common.MakeMessage(client, data)
+}
+
+//读取客户端数据
 func (manager *ConnectManager) receiveMsg(ip string, data net_struct.TCPClientData) {
 	manager.onMsgChan <- common.MakeMessage(ip, data)
 }
 
+//读取管道数据
 func (manager *ConnectManager) OnReadMsg() {
 	defer manager.wg.Done()
 	for {
@@ -117,17 +132,24 @@ func (manager *ConnectManager) OnReadMsg() {
 			if client != nil {
 				if manager.middleWareFunc == nil {
 					eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).
-						CallProto(res.PROTOCOL_C2S, value.Data().Header.MessageID, value.Data())
+						CallProto(res.PROTOCOL_C2S, value.ClientAddr(), value.Data().Header.MessageID, value.Data())
 				} else {
 
-					_, err := manager.middleWareFunc(res.PROTOCOL_C2S, value.Data().Header.MessageID, value.Data())
+					_, err := manager.middleWareFunc(res.PROTOCOL_C2S, value.ClientAddr(), value.Data().Header.MessageID, value.Data())
 					if err == nil {
 						eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).
-							CallProto(res.PROTOCOL_C2S, value.Data().Header.MessageID, value.Data())
+							CallProto(res.PROTOCOL_C2S, value.ClientAddr(), value.Data().Header.MessageID, value.Data())
 					} else {
 						fmt.Println("中间层错误", err)
 					}
 				}
+			}
+
+		case value, _ := <-manager.onLocalMsgChan:
+			client := manager.clients[value.ClientAddr()]
+			if client != nil {
+				// TODO   middle ware 最好做个中间发送层
+				_ = client.SendMessage(value.Data())
 			}
 		}
 	}

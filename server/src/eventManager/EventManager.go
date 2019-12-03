@@ -1,61 +1,68 @@
 package eventManager
 
-import "redisProject/src/common"
+import (
+	"redisProject/src/common"
+	"redisProject/src/net_struct"
+)
 
 type Event struct {
 	Action func(args interface{})
 }
 
+type ProtoEvent struct {
+	Action func(ip string, msgid uint32, data *net_struct.TCPClientData)
+}
+
 type EventManager struct {
 	eventPackage map[string][]*Event
 	//addr msgID
-	protoEventPackage map[common.ProtoMsgHead][]*Event
+	protoEventPackage map[common.ProtoMsgHead][]*func(ip string, msgid uint32, data *net_struct.TCPClientData)
 }
 
 func (manager *EventManager) initSetting() {
 	manager.eventPackage = make(map[string][]*Event)
-	manager.protoEventPackage = make(map[common.ProtoMsgHead][]*Event)
+	manager.protoEventPackage = make(map[common.ProtoMsgHead][]*func(ip string, msgid uint32, data *net_struct.TCPClientData))
 }
 
 func (manager *EventManager) AddEventAction(eventName string, callback *Event) {
 	if manager.eventPackage[eventName] == nil {
-		manager.eventPackage [eventName] = make([]*Event, 1)
+		manager.eventPackage[eventName] = make([]*Event, 1)
 	}
-	manager.eventPackage [eventName] = append(manager.eventPackage [eventName], callback)
+	manager.eventPackage[eventName] = append(manager.eventPackage[eventName], callback)
 }
 
 //协议事件
-func (manager *EventManager) AddProtoEventAction(eventName string, msgID uint32, callback *Event) {
+func (manager *EventManager) AddProtoEventAction(eventName string, msgID uint32, callback *func(ip string, msgid uint32, data *net_struct.TCPClientData)) {
 	searchProto := common.NewProtoMsgHead(eventName, msgID)
 	if manager.protoEventPackage[searchProto] == nil {
-		manager.protoEventPackage [searchProto] = make([]*Event, 1)
+		manager.protoEventPackage[searchProto] = make([]*func(ip string, msgid uint32, data *net_struct.TCPClientData), 1)
 	}
-	manager.protoEventPackage [searchProto] = append(manager.protoEventPackage [searchProto], callback)
+	manager.protoEventPackage[searchProto] = append(manager.protoEventPackage[searchProto], callback)
 }
 
-func (manager *EventManager) RemoveProtoEventAction(eventName string, msgID uint32, callback *Event) {
+func (manager *EventManager) RemoveProtoEventAction(eventName string, msgID uint32, callback *func(ip string, msgid uint32, data *net_struct.TCPClientData)) {
 	searchProto := common.NewProtoMsgHead(eventName, msgID)
 	if manager.protoEventPackage[searchProto] == nil {
-		manager.protoEventPackage [searchProto] = make([]*Event, 1)
+		manager.protoEventPackage[searchProto] = make([]*func(ip string, msgid uint32, data *net_struct.TCPClientData), 1)
 	}
-	for i := 0; i < len(manager.protoEventPackage [searchProto]); i++ {
-		ele := manager.protoEventPackage [searchProto][i]
+	for i := 0; i < len(manager.protoEventPackage[searchProto]); i++ {
+		ele := manager.protoEventPackage[searchProto][i]
 
 		if ele == callback {
-			manager.protoEventPackage [searchProto] = append(manager.protoEventPackage [searchProto][:i], manager.protoEventPackage [searchProto][i+1:]...)
+			manager.protoEventPackage[searchProto] = append(manager.protoEventPackage[searchProto][:i], manager.protoEventPackage[searchProto][i+1:]...)
 			break
 		}
 	}
 }
 
-func (manager *EventManager) CallProto(eventName string, msgID uint32, data interface{}) {
+func (manager *EventManager) CallProto(eventName string, ip string, msgID uint32, data *net_struct.TCPClientData) {
 	searchProto := common.NewProtoMsgHead(eventName, msgID)
 	v := manager.protoEventPackage[searchProto]
 	if len(v) > 0 {
 		for i := 0; i < len(v); i++ {
 			callBack := v[i]
 			if callBack != nil {
-				callBack.Action(data)
+				(*callBack)(ip, msgID, data)
 			}
 		}
 	}
@@ -63,13 +70,13 @@ func (manager *EventManager) CallProto(eventName string, msgID uint32, data inte
 
 func (manager *EventManager) RemoveEventAction(eventName string, callback *Event) {
 	if manager.eventPackage[eventName] == nil {
-		manager.eventPackage [eventName] = make([]*Event, 1)
+		manager.eventPackage[eventName] = make([]*Event, 1)
 	}
-	for i := 0; i < len(manager.eventPackage [eventName]); i++ {
-		ele := manager.eventPackage [eventName][i]
+	for i := 0; i < len(manager.eventPackage[eventName]); i++ {
+		ele := manager.eventPackage[eventName][i]
 
 		if ele == callback {
-			manager.eventPackage [eventName] = append(manager.eventPackage [eventName][:i], manager.eventPackage [eventName][i+1:]...)
+			manager.eventPackage[eventName] = append(manager.eventPackage[eventName][:i], manager.eventPackage[eventName][i+1:]...)
 			break
 		}
 	}
