@@ -1,5 +1,7 @@
 package net_struct
 
+import "redisProject/src/pack"
+
 type TCPClientHeader struct {
 	Length    uint32
 	Flag      uint32 //代表客户端发来的信息
@@ -13,30 +15,28 @@ func MakeHeader(msgID uint32) TCPClientHeader {
 	return TCPClientHeader{MessageID: msgID, Flag: 1}
 }
 
-
 type TCPClientData struct {
 	Header TCPClientHeader // 头部信息
-	body []byte
+	body   []byte
 }
 
 func NewTCPClientData(header TCPClientHeader, body []byte) *TCPClientData {
 	return &TCPClientData{Header: header, body: body}
 }
-func (SELF* TCPClientData)GetBody() []byte  {
+func (SELF *TCPClientData) GetBody() []byte {
 	return SELF.body
 }
 
+func (SELF *TCPClientData) SetBody(data interface{}) {
+	SELF.body = pack.Decode(data)
+}
 
 type TCPServerTargetAddr struct {
 	fromServer string
-	toServer string
+	toServer   string
 }
-
-
-
 
 type TCPServerData struct {
-	Target TCPServerTargetAddr
+	Target     TCPServerTargetAddr
 	ClientData TCPClientData
 }
-

@@ -1,6 +1,7 @@
 package eventManager
 
 import (
+	"fmt"
 	"redisProject/src/common"
 	"redisProject/src/net_struct"
 )
@@ -56,6 +57,7 @@ func (manager *EventManager) RemoveProtoEventAction(eventName string, msgID uint
 }
 
 func (manager *EventManager) CallProto(eventName string, ip string, msgID uint32, data *net_struct.TCPClientData) {
+	fmt.Println("发送事件------->>>", eventName, ip, msgID, data)
 	searchProto := common.NewProtoMsgHead(eventName, msgID)
 	v := manager.protoEventPackage[searchProto]
 	if len(v) > 0 {

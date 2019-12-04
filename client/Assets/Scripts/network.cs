@@ -39,7 +39,11 @@ public class network : MonoBehaviour
     void Start()
     {
         EventManager.Instance.AddEventAction("OnLogin", onLogin);
-        this.on_recv_tcp_data = message => { LogTool.Instance.ToStringAll(message.Header); };
+        this.on_recv_tcp_data = message =>
+        {
+            Debug.Log("------------------------->>>>");
+            LogTool.Instance.ToStringAll(message.Header);
+        };
         connect2Server();
     }
 
@@ -65,7 +69,6 @@ public class network : MonoBehaviour
         {
             EventManager.Instance.Call("EVENT.NET.MESSAGE", sMessage);
         }
-        
     }
 
     private void OnDestroy()
@@ -175,7 +178,7 @@ public class network : MonoBehaviour
             catch (Exception e)
             {
                 Debug.Log(e.Message);
-                EventManager.Instance.Call("EVENT.NET.CLOSE",null);
+                EventManager.Instance.Call("EVENT.NET.CLOSE", null);
                 break;
             }
         }

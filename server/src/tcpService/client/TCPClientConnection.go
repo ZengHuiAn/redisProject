@@ -44,10 +44,10 @@ func (c *CustomClient) initSetting() {
 	c.isClosed = false
 }
 func (c *CustomClient) SendMessage(data *net_struct.TCPClientData) error {
+	fmt.Println("发送", c.isClosed)
 	if c.isClosed == true {
 		return errors.New("管道已关闭")
 	}
-
 	c.writerChanel <- data
 
 	return nil
@@ -96,7 +96,7 @@ func (c *CustomClient) GOReader(conn net.Conn) {
 		}
 
 		fmt.Println("read data :", header)
-		dataBuffer := make([]byte, header.Length-net_struct.ClientClientHeaderLength);
+		dataBuffer := make([]byte, header.Length-net_struct.ClientClientHeaderLength)
 		readLen, err = reader.Read(dataBuffer)
 
 		if err != nil || err == io.EOF {
@@ -121,6 +121,7 @@ func (c *CustomClient) GOWriter(conn net.Conn) {
 		select {
 
 		case tcpClientData, isClose := <-c.writerChanel:
+			fmt.Println("开始写入", tcpClientData)
 			if !isClose {
 				c.isClosed = true
 				log.Println("写入管道已关闭------->>>", ip)
@@ -140,8 +141,9 @@ func (c *CustomClient) GOWriter(conn net.Conn) {
 				log.Println("writer error ", err)
 				return
 			}
-			_, err = writer.Write(buffer.Bytes())
-			_ = writer.Flush()
+			len, err := writer.Write(buffer.Bytes())
+			fmt.Println(len, err)
+			err = writer.Flush()
 			if err != nil {
 				log.Println("writer error ", err)
 				return

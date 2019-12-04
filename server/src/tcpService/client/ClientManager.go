@@ -58,6 +58,7 @@ func (manager *ConnectManager) initSetting() {
 	manager.connectChan = make(chan *CustomClient)
 	manager.disConnectChan = make(chan string)
 	manager.onMsgChan = make(chan common.Message)
+	manager.onLocalMsgChan = make(chan common.Message)
 	//manager.wg = make(sync.WaitGroup)
 	eventManager.GetEventManagerForName(res.EVENTMGR_CONNECT_Name).
 		AddEventAction(res.CONTENT_NAME_EVENT_CLIENT_READ_ERROR,
@@ -80,9 +81,10 @@ func (manager *ConnectManager) CloseClient1(names string) {
 //运行连接携程
 func (manager *ConnectManager) Run() {
 	defer manager.closeAll()
-	manager.wg.Add(2)
+	manager.wg.Add(3)
 	go manager.OnConnAndClose()
 	go manager.OnReadMsg()
+	go manager.OnLoadReadMsg()
 	manager.wg.Wait()
 }
 
@@ -114,7 +116,9 @@ func (manager *ConnectManager) ReceiveLocalMsgMany(clients []string, data net_st
 
 //接收本地发送方法---------->>>>
 func (manager *ConnectManager) ReceiveLocalMsgDone(client string, data net_struct.TCPClientData) {
+	fmt.Println("ReceiveLocalMsgDone", client)
 	manager.onLocalMsgChan <- common.MakeMessage(client, data)
+	fmt.Println("ReceiveLocalMsgDone success", client)
 }
 
 //读取客户端数据
@@ -127,14 +131,14 @@ func (manager *ConnectManager) OnReadMsg() {
 	defer manager.wg.Done()
 	for {
 		select {
-		case value, _ := <-manager.onMsgChan:
+		case value, err := <-manager.onMsgChan:
+			fmt.Println(err)
 			client := manager.clients[value.ClientAddr()]
 			if client != nil {
 				if manager.middleWareFunc == nil {
 					eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).
 						CallProto(res.PROTOCOL_C2S, value.ClientAddr(), value.Data().Header.MessageID, value.Data())
 				} else {
-
 					_, err := manager.middleWareFunc(res.PROTOCOL_C2S, value.ClientAddr(), value.Data().Header.MessageID, value.Data())
 					if err == nil {
 						eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).
@@ -145,7 +149,24 @@ func (manager *ConnectManager) OnReadMsg() {
 				}
 			}
 
-		case value, _ := <-manager.onLocalMsgChan:
+		case value, err := <-manager.onLocalMsgChan:
+			fmt.Println("前往发送,", value.ClientAddr(), err)
+			client := manager.clients[value.ClientAddr()]
+			if client != nil {
+				// TODO   middle ware 最好做个中间发送层
+				_ = client.SendMessage(value.Data())
+			}
+		}
+	}
+}
+
+//读取管道数据
+func (manager *ConnectManager) OnLoadReadMsg() {
+	defer manager.wg.Done()
+	for {
+		select {
+		case value, err := <-manager.onLocalMsgChan:
+			fmt.Println("前往发送,", value.ClientAddr(), err)
 			client := manager.clients[value.ClientAddr()]
 			if client != nil {
 				// TODO   middle ware 最好做个中间发送层

@@ -1,16 +1,14 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net"
 	"os"
-	"redisProject/src/eventManager"
 	"redisProject/src/net_struct"
-	"redisProject/src/pack"
 	"redisProject/src/static/res"
 	"redisProject/src/tcpService/client"
+	_ "redisProject/src/tcpService/userService"
 	"strconv"
 )
 
@@ -24,6 +22,7 @@ var s_instance = net_struct.ServerInstance{
 }
 
 func main() {
+	//userService.UserMain{}
 	fmt.Println(s_instance.Config.GetHost() + ":" + strconv.Itoa(s_instance.Config.Port))
 	var listener, err = net.Listen(s_instance.Config.ProtocolType, s_instance.Config.GetHost()+":"+strconv.Itoa(s_instance.Config.Port))
 
@@ -32,18 +31,13 @@ func main() {
 		return
 	}
 
-
 	defer listener.Close()
 
-	
-
-	eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).AddProtoEventAction(res.PROTOCOL_C2S,101,&eventManager.Event{Action: func(args interface{}) {
-		fmt.Println("收到客户端数据----->>>",pack.Encode(args.(*net_struct.TCPClientData).GetBody()))
-	}})
+	//eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).AddProtoEventAction(res.PROTOCOL_C2S,101, func() {})
 	connectManager := client.GetManagerForName(res.CONNECT_MGR_Name)
-	connectManager.RegisterMiddle(func(msgName string, msgID uint32, data *net_struct.TCPClientData) (b bool, e error) {
-		return false, errors.New("测试错误------>>>")
-	})
+	//connectManager.RegisterMiddle(func(msgName string, ip string, msgID uint32, data *net_struct.TCPClientData) (bool, error) {
+	//	return false, errors.New("测试错误------>>>")
+	//})
 	go connectManager.Run()
 	fmt.Println(fmt.Sprintf("ProtocolType %s, addr %s", listener.Addr().Network(), listener.Addr().String()))
 	for {
@@ -54,11 +48,8 @@ func main() {
 		}
 
 		fmt.Println(fmt.Sprintf("message %s -> %s", conn.RemoteAddr(), conn.LocalAddr()))
-		client := client.NewCustomClient(connectManager.Name(),conn)
+		client := client.NewCustomClient(connectManager.Name(), conn)
 		connectManager.RegisterClient(client)
 	}
 
 }
-
-
-

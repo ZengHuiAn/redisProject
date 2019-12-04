@@ -31,7 +31,11 @@ public class TestMSGPack : MonoBehaviour
         {
             Debug.Log(VARIABLE);
         }
-
+        EventManager.Instance.AddEventAction("EVENT.NET.MESSAGE", (msg) =>
+        {
+            SMessage m = msg as SMessage;
+            
+        });
 //
 //        var bs = NetPackData.pack_all(obj);
 ////        
@@ -51,12 +55,14 @@ public class TestMSGPack : MonoBehaviour
         EventManager.Instance.Call("OnLogin",null);
     }
 
+    private static int sn = 0;
 
     public void sendNetData()
     {
 
         var obj = new object[]
         {
+            sn+=1,
             InputFields[0].text,
             InputFields[1].text
         };
