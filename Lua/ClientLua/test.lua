@@ -7,7 +7,7 @@ local V = {}
 
 function V:start()
     print("start")
-
+    print(self)
     print(RegisterEvent)
     RegisterEvent("EVENT.NET.MESSAGE.102", function(...)
         local args = ...

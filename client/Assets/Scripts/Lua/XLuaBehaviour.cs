@@ -5,10 +5,12 @@ using UnityEngine;
 using  XLua;
 public class XLuaBehaviour : MonoBehaviour
 {
+        [CSharpCallLua]
+        public delegate void LuaObjectAction(object lauObject, params object[] args);
         public string luaScript;
-        private Action luaStart;
-        private Action luaUpdate;
-        private Action luaOnDestroy;
+        private LuaObjectAction  luaStart;
+        private LuaObjectAction  luaUpdate;
+        private LuaObjectAction  luaOnDestroy;
 
         private LuaTable scriptEnv;
 
@@ -35,7 +37,7 @@ public class XLuaBehaviour : MonoBehaviour
             }
             print(obj.Length);
 //            Action luaAwake = scriptEnv.Get<Action>("awake");
-            scriptEnv.Get("start", out luaStart);
+            scriptEnv.Get("start",out luaStart);
             scriptEnv.Get("update", out luaUpdate);
             scriptEnv.Get("ondestroy", out luaOnDestroy);
             
@@ -46,7 +48,7 @@ public class XLuaBehaviour : MonoBehaviour
         {
             if (luaStart != null)
             {
-                luaStart();
+                luaStart(scriptEnv);
             }
         }
 
@@ -55,7 +57,7 @@ public class XLuaBehaviour : MonoBehaviour
         {
             if (luaUpdate != null)
             {
-                luaUpdate();
+                luaUpdate(scriptEnv);
             }
         }
         
@@ -63,7 +65,7 @@ public class XLuaBehaviour : MonoBehaviour
         {
             if (luaOnDestroy != null)
             {
-                luaOnDestroy();
+                luaOnDestroy(scriptEnv);
             }
             luaOnDestroy = null;
             luaUpdate = null;
