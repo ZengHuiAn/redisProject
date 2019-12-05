@@ -132,6 +132,11 @@ public class NetUnPackData
     {
         return unpack_common(ref bytes);
     }
+    
+    public static object unpack_all_lua(byte[] bytes)
+    {
+        return unpack_common_lua(ref bytes);
+    }
 
     public static object unpack_common(ref byte[] bytes)
     {
@@ -188,6 +193,78 @@ public class NetUnPackData
                 var arrayLen = (Int32) by;
                 
                 var composeData = new object[arrayLen];
+
+
+                for (int i = 0; i < arrayLen; i++)
+                {
+                    var itemValue = unpack_common(ref bytes);
+                    composeData[i] = itemValue;
+                }
+
+                result = composeData;
+                break;
+            default:
+                throw new InvalidOperationException("Not supported primitive object resolver. type: " + code);
+        }
+
+        return result;
+    }
+    
+    public static object unpack_common_lua(ref byte[] bytes)
+    {
+        byte pack_type =  (byte)unpack_Byte_data(ref bytes);
+
+        var code = (EPackType) pack_type;
+//        var code = (EPackType) unpack_Byte_data(ref bytes);
+        object result;
+        switch (code)
+        {
+            case EPackType.BOOL:
+                result = unpack_bool_data(ref bytes);
+                break;
+            case EPackType.CHAR:
+                result = unpack_char_data(ref bytes);
+                break;
+            case EPackType.BYTE:
+                result = unpack_Byte_data(ref bytes);
+                break;
+            case EPackType.INT16:
+                result = unpack_int16_data(ref bytes);
+                break;
+            case EPackType.UINT16:
+                result = unpack_uint16_data(ref bytes);
+                break;
+            case EPackType.INT32:
+                result = unpack_int32_data(ref bytes);
+                break;
+            case EPackType.UINT32:
+                result = unpack_uint32_data(ref bytes);
+                break;
+            case EPackType.INT64:
+                result = unpack_int64_data(ref bytes);
+                break;
+            case EPackType.UINT64:
+                result = unpack_uint64_data(ref bytes);
+                break;
+            case EPackType.SINGLE:
+                result = unpack_float_data(ref bytes);
+                break;
+            case EPackType.DOUBLE:
+                result = unpack_double_data(ref bytes);
+                break;
+            case EPackType.STRING:
+                result = unpack_string_data(ref bytes);
+                break;
+            case EPackType.BYTEARRAY:
+                result = unpack_bytes_data(ref bytes);
+                break;
+            case EPackType.ARRAY:
+                // 解的数组的长度
+                byte by =  (byte)unpack_Byte_data(ref bytes);
+
+                var arrayLen = (Int32) by;
+
+                var composeData = LuaController.Instance.L.NewTable();
 
 
                 for (int i = 0; i < arrayLen; i++)

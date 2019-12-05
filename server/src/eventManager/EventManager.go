@@ -26,10 +26,13 @@ func (manager *EventManager) initSetting() {
 }
 
 func (manager *EventManager) AddEventAction(eventName string, callback *Event) {
-	if manager.eventPackage[eventName] == nil {
-		manager.eventPackage[eventName] = make([]*Event, 1)
-	}
+
+	fmt.Println(eventName,"注冊---->>>")
+	//if manager.eventPackage[eventName] == nil {
+	//	manager.eventPackage[eventName] = make([]*Event,100)
+	//}
 	manager.eventPackage[eventName] = append(manager.eventPackage[eventName], callback)
+	fmt.Println(manager.eventPackage[eventName])
 }
 
 //协议事件
@@ -86,6 +89,8 @@ func (manager *EventManager) RemoveEventAction(eventName string, callback *Event
 
 func (manager *EventManager) Call(eventName string, data interface{}) {
 	v := manager.eventPackage[eventName]
+
+	fmt.Println("發送事件",eventName,v)
 	if len(v) > 0 {
 		for i := 0; i < len(v); i++ {
 			callBack := v[i]

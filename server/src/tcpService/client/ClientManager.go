@@ -55,12 +55,12 @@ func (manager *ConnectManager) OnCloseClient(name interface{}) {
 func (manager *ConnectManager) initSetting() {
 	manager.clients = make(map[string]*CustomClient)
 	manager.groupCount = 0
-	manager.connectChan = make(chan *CustomClient)
+	manager.connectChan = make(chan *CustomClient, 10)
 	manager.disConnectChan = make(chan string)
 	manager.onMsgChan = make(chan common.Message)
 	manager.onLocalMsgChan = make(chan common.Message)
 	//manager.wg = make(sync.WaitGroup)
-	eventManager.GetEventManagerForName(res.EVENTMGR_CONNECT_Name).
+	eventManager.GetEventManagerForName(res.CONNECT_MGR_Name).
 		AddEventAction(res.CONTENT_NAME_EVENT_CLIENT_READ_ERROR,
 			&eventManager.Event{Action: manager.OnCloseClient})
 }
@@ -76,13 +76,13 @@ func (manager *ConnectManager) CloseClient(names []string) {
 // 关闭一个客户端
 func (manager *ConnectManager) CloseClient1(names string) {
 	manager.disConnectChan <- names
+	manager.OnCloseWith()
 }
 
 //运行连接携程
 func (manager *ConnectManager) Run() {
 	defer manager.closeAll()
-	manager.wg.Add(3)
-	go manager.OnConnAndClose()
+	manager.wg.Add(2)
 	go manager.OnReadMsg()
 	go manager.OnLoadReadMsg()
 	manager.wg.Wait()
@@ -99,6 +99,7 @@ func (manager *ConnectManager) closeAll() {
 // 注册一个连接的客户端
 func (manager *ConnectManager) RegisterClient(itemClient *CustomClient) {
 	manager.connectChan <- itemClient
+	manager.OnConnWith()
 }
 
 // 运行客户端读写携程
@@ -177,16 +178,19 @@ func (manager *ConnectManager) OnLoadReadMsg() {
 }
 
 //监听到信息时
-func (manager *ConnectManager) OnConnAndClose() {
-	defer manager.wg.Done()
-	for {
-		select {
-		case value, _ := <-manager.disConnectChan:
-			client := manager.clients[value]
-			client.OnDispose()
-		case itemClient, _ := <-manager.connectChan:
-			manager.addItemClient(itemClient)
-		}
+func (manager *ConnectManager) OnConnWith() {
+	select {
+	case itemClient, err := <-manager.connectChan:
+		fmt.Println("監聽到客戶端鏈接", err)
+		manager.addItemClient(itemClient)
+	}
+}
+
+func (manager *ConnectManager) OnCloseWith() {
+	select {
+	case value, _ := <-manager.disConnectChan:
+		client := manager.clients[value]
+		client.OnDispose()
 	}
 }
 

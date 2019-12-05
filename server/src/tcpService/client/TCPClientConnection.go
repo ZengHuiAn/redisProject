@@ -82,7 +82,7 @@ func (c *CustomClient) GOReader(conn net.Conn) {
 		readLen, err := reader.Read(headerBuf)
 		if err != nil || err == io.EOF {
 			log.Println("read error ", err)
-			eventManager.GetEventManagerForName(res.CONNECT_MGR_Name).
+			go eventManager.GetEventManagerForName(res.CONNECT_MGR_Name).
 				Call(res.CONTENT_NAME_EVENT_CLIENT_READ_ERROR, ip)
 			break
 		}

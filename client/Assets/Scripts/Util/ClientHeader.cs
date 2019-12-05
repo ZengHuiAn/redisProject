@@ -52,7 +52,7 @@ public class SMessage
             {
                 if (message !=null && message.Length !=0)
                 {
-                    this.content = NetUnPackData.unpack_all(this.message);
+                    this.content = NetUnPackData.unpack_all_lua(this.message);
                 }
             }
 

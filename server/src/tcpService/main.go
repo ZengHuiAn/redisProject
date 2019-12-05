@@ -49,7 +49,7 @@ func main() {
 
 		fmt.Println(fmt.Sprintf("message %s -> %s", conn.RemoteAddr(), conn.LocalAddr()))
 		client := client.NewCustomClient(connectManager.Name(), conn)
-		connectManager.RegisterClient(client)
+		go connectManager.RegisterClient(client)
 	}
 
 }

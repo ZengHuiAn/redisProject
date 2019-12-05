@@ -34,7 +34,8 @@ public class TestMSGPack : MonoBehaviour
         EventManager.Instance.AddEventAction("EVENT.NET.MESSAGE", (msg) =>
         {
             SMessage m = msg as SMessage;
-            
+            print(m.Header.MessageID);
+            EventManager.Instance.Call($"EVENT.NET.MESSAGE.{m.Header.MessageID}",1.5);
         });
 //
 //        var bs = NetPackData.pack_all(obj);

@@ -18,7 +18,7 @@ public static class FileUtils
             {
                 string filepath = "";
 #if UNITY_EDITOR
-                filepath = UnityEngine.Application.dataPath + "/Lua/";
+                filepath = UnityEngine.Application.dataPath + "/../../Lua/ClientLua/";
 
 #elif UNITY_IPHONE
 	        filepath = Application.dataPath +"/Raw/Lua/";
@@ -36,7 +36,7 @@ public static class FileUtils
             string convertName = fileName.Replace('.', '/');
             string filepath;
 #if UNITY_EDITOR
-            filepath = UnityEngine.Application.dataPath + "/../../Lua/ClientLua/";
+            filepath = envPath;
 
 #elif UNITY_IPHONE
 	        filepath = Application.dataPath +"/Raw/Lua/";
@@ -55,7 +55,7 @@ public static class FileUtils
             string convertName = fileName.Replace('.', '/');
             string filepath;
 #if UNITY_EDITOR
-            filepath = UnityEngine.Application.dataPath + "/../../Lua/ClientLua/";
+            filepath = envPath;
 
 #elif UNITY_IPHONE
 	        filepath = Application.dataPath +"/Raw/Lua/";
