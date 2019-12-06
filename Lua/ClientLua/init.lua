@@ -15,3 +15,47 @@ function main()
 
     --UnityEngine.SceneManagement.SceneManager.LoadScene("LoginScene");
 end
+
+lua_class = require("class")
+
+
+
+
+-- 打印表的格式的方法
+local function _sprinttb(tb, tabspace)
+    tabspace =tabspace or ''
+    local str =string.format(tabspace .. '{\n' )
+    for k,v in pairs(tb or {}) do
+        if type(v)=='table' then
+            if type(k)=='string' then
+                str =str .. string.format("%s%s =\n", tabspace..'  ', k)
+                str =str .. _sprinttb(v, tabspace..'  ')
+            elseif type(k)=='number' then
+                str =str .. string.format("%s[%d] =\n", tabspace..'  ', k)
+                str =str .. _sprinttb(v, tabspace..'  ')
+            end
+        else
+            if type(k)=='string' then
+                str =str .. string.format("%s%s = %s,\n", tabspace..'  ', tostring(k), tostring(v))
+            elseif type(k)=='number' then
+                str =str .. string.format("%s[%s] = %s,\n", tabspace..'  ', tostring(k), tostring(v))
+            end
+        end
+    end
+    str =str .. string.format(tabspace .. '},\n' )
+    return str
+end
+
+function sprinttb(tb, tabspace)
+    if CS.UnityEngine.Application.isEditor then
+        local function ss()
+            return _sprinttb(tb, tabspace);
+        end
+        return setmetatable({}, {
+            __concat = ss,
+            __tostring = ss,
+        });
+    else
+        return "";
+    end
+end

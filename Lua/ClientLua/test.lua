@@ -5,6 +5,14 @@
 ---
 local V = {}
 
+V.data = {
+    1,
+    2,
+    {
+        "123",112
+    }
+}
+
 function V:start()
     print("start")
     print(self)

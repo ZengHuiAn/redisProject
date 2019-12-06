@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using  XLua;
+using Object = System.Object;
+
 public class XLuaBehaviour : MonoBehaviour
 {
         [CSharpCallLua]
@@ -36,6 +38,19 @@ public class XLuaBehaviour : MonoBehaviour
                 return;
             }
             print(obj.Length);
+            var data = scriptEnv.GetInPath<LuaTable>("data");
+
+            foreach (var VARIABLE in data.GetKeys())
+            {
+                var value = data.Get<object>(VARIABLE);
+                var t = value.GetType();
+                if (t == typeof(XLua.LuaTable))
+                {
+                    print(t);
+                }
+                
+                
+            }
 //            Action luaAwake = scriptEnv.Get<Action>("awake");
             scriptEnv.Get("start",out luaStart);
             scriptEnv.Get("update", out luaUpdate);
