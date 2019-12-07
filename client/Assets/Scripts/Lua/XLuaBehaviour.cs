@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using MessagePack;
 using UnityEngine;
 using Util;
 using  XLua;
@@ -41,11 +42,13 @@ public class XLuaBehaviour : MonoBehaviour
             print(obj.Length);
             var data = scriptEnv.GetInPath<LuaTable>("data");
 
-            var result = LuaConvert.NetConvertToObject(data);
-            var netMessage = NetPackData.pack_all(result);
-           print(netMessage);
+            var result = LuaConvert.ConvertToObject(data);
+            var ret = MessagePackSerializer.ToJson(result);
+            print(ret);
+
+            var body = MessagePackSerializer.FromJson(ret);
             
-            print(result);
+            LogTool.Instance.ToStringAll(body);
             //            Action luaAwake = scriptEnv.Get<Action>("awake");
             scriptEnv.Get("start",out luaStart);
             scriptEnv.Get("update", out luaUpdate);

@@ -1,6 +1,9 @@
 package net_struct
 
-import "redisProject/src/pack"
+import (
+	msgPack "github.com/ugorji/go/codec"
+	"redisProject/src/pack"
+)
 
 type TCPClientHeader struct {
 	Length    uint32
@@ -28,7 +31,7 @@ func (SELF *TCPClientData) GetBody() []byte {
 }
 
 func (SELF *TCPClientData) SetBody(data interface{}) {
-	SELF.body = pack.Decode(data)
+	SELF.body = msgPack.Decoder{}
 }
 
 type TCPServerTargetAddr struct {
