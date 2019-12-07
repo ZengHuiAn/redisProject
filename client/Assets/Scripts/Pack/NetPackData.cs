@@ -136,7 +136,7 @@ public class NetPackData
         return source.ToArray();
     }
 
-    public static byte[] pack_common(object value)
+    private static byte[] pack_common(object value)
     {
         
         if (value == null)

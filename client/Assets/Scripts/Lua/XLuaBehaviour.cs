@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Util;
 using  XLua;
 using Object = System.Object;
 
@@ -40,18 +41,12 @@ public class XLuaBehaviour : MonoBehaviour
             print(obj.Length);
             var data = scriptEnv.GetInPath<LuaTable>("data");
 
-            foreach (var VARIABLE in data.GetKeys())
-            {
-                var value = data.Get<object>(VARIABLE);
-                var t = value.GetType();
-                if (t == typeof(XLua.LuaTable))
-                {
-                    print(t);
-                }
-                
-                
-            }
-//            Action luaAwake = scriptEnv.Get<Action>("awake");
+            var result = LuaConvert.NetConvertToObject(data);
+            var netMessage = NetPackData.pack_all(result);
+           print(netMessage);
+            
+            print(result);
+            //            Action luaAwake = scriptEnv.Get<Action>("awake");
             scriptEnv.Get("start",out luaStart);
             scriptEnv.Get("update", out luaUpdate);
             scriptEnv.Get("ondestroy", out luaOnDestroy);
