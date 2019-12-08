@@ -1,13 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
 	"redisProject/src/net_struct"
+	"redisProject/src/static/res"
+	"redisProject/src/tcpService/client"
+	_ "redisProject/src/tcpService/userService"
 	"strconv"
 )
 
@@ -21,7 +22,7 @@ var s_instance = net_struct.ServerInstance{
 }
 
 func main() {
-
+	//userService.UserMain{}
 	fmt.Println(s_instance.Config.GetHost() + ":" + strconv.Itoa(s_instance.Config.Port))
 	var listener, err = net.Listen(s_instance.Config.ProtocolType, s_instance.Config.GetHost()+":"+strconv.Itoa(s_instance.Config.Port))
 
@@ -31,6 +32,13 @@ func main() {
 	}
 
 	defer listener.Close()
+
+	//eventManager.GetEventManagerForName(res.EVENTMGR_PROTOCOL_Name).AddProtoEventAction(res.PROTOCOL_C2S,101, func() {})
+	connectManager := client.GetManagerForName(res.CONNECT_MGR_Name)
+	//connectManager.RegisterMiddle(func(msgName string, ip string, msgID uint32, data *net_struct.TCPClientData) (bool, error) {
+	//	return false, errors.New("测试错误------>>>")
+	//})
+	go connectManager.Run()
 	fmt.Println(fmt.Sprintf("ProtocolType %s, addr %s", listener.Addr().Network(), listener.Addr().String()))
 	for {
 		conn, err := listener.Accept()
@@ -40,43 +48,8 @@ func main() {
 		}
 
 		fmt.Println(fmt.Sprintf("message %s -> %s", conn.RemoteAddr(), conn.LocalAddr()))
-		go handleRequest(conn)
-	}
-
-}
-
-func handleRequest(conn net.Conn) {
-	ip := conn.RemoteAddr().String()
-
-	defer func() {
-		fmt.Println(fmt.Sprintf("disconnect: %s", ip))
-		conn.Close()
-	}()
-
-	reader := bufio.NewReader(conn)
-	writer := bufio.NewWriter(conn)
-
-	for {
-		headerBuf := make([]byte, 4)
-		fmt.Println("读取数据---------->>>>",ip)
-		readLen, err := reader.Read(headerBuf)
-		if err!=nil || err == io.EOF {
-			log.Println("read error ", err)
-			break
-		}
-
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", readLen, headerBuf))
-		writerLen, err := writer.Write(headerBuf)
-		_ = writer.Flush()
-		if err != nil {
-			log.Println("writer error ", err)
-			return
-		}
-
-
-		
-
-		fmt.Println(fmt.Sprintf(" read success length : %d, msg : %s", writerLen, headerBuf))
+		client := client.NewCustomClient(connectManager.Name(), conn)
+		go connectManager.RegisterClient(client)
 	}
 
 }

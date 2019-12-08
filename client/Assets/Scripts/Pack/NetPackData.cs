@@ -17,8 +17,8 @@ public class NetPackData
 
     public static byte[] pack_char_data(char value)
     {
-        byte[] int_bytes = BitConverter.GetBytes(value);
-        
+        byte[] int_bytes = BitConverter.GetBytes(Convert.ToInt32(value));
+
         return int_bytes;
     }    
     
@@ -136,7 +136,7 @@ public class NetPackData
         return source.ToArray();
     }
 
-    public static byte[] pack_common(object value)
+    private static byte[] pack_common(object value)
     {
         
         if (value == null)
@@ -161,9 +161,9 @@ public class NetPackData
                 case EPackType.BOOL:
                     tempArray = pack_bool_data((bool) value);
                     break;
-                case EPackType.CHAR:
-                    tempArray = pack_char_data((char) value);
-                    break;
+//                case EPackType.CHAR:
+//                    tempArray = pack_char_data((char) value);
+//                    break;
                 case EPackType.BYTE:
                     tempArray = pack_Byte_data((byte) value);
                     break;
