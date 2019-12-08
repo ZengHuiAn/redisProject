@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Grpc.Core;
 using NetLib;
 namespace NetClient

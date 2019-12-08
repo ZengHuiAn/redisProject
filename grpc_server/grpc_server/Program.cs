@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NetLib;
 using Grpc.Core;
 using Server.UserLogic;
