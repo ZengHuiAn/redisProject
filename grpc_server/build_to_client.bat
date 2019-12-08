@@ -1,0 +1,2 @@
+copy /Y .\ServerLibrary\bin\Debug\ServerLibrary.dll ..\client\Assets\Plugins\Protocol\ServerLibrary.dll
+copy /Y .\ServerLibrary\bin\Debug\ServerLibrary.pdb ..\client\Assets\Plugins\Protocol\ServerLibrary.pdb

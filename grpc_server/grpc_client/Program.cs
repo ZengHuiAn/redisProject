@@ -1,6 +1,6 @@
 using System;
 using Grpc.Core;
-using NetLib;
+using NetLib.CommonUser;
 namespace NetClient
 {
     class Program
@@ -9,11 +9,11 @@ namespace NetClient
         {
             Channel channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
 
-            var client = new User.UserClient(channel);
+            var client = new RPC_User.RPC_UserClient(channel);
             String user = "测试一下";
 
-            var reply = client.SayHello(new UserRequest() { Name = user });
-            Console.WriteLine("Greeting: " + reply.Message);
+            var reply = client.CreateUser(new UserRequest() { Name = user,Passwd = "123456"});
+            Console.WriteLine("Greeting: " + reply.ErrorCode + reply.Uuid);
 
             channel.ShutdownAsync().Wait();
             Console.WriteLine("Press any key to exit...");

@@ -7,15 +7,23 @@ using Util;
 using  XLua;
 using Object = System.Object;
 
+[System.Serializable]
+public class Injection
+{
+    public string name;
+    public GameObject value;
+}
+[LuaCallCSharp]
 public class XLuaBehaviour : MonoBehaviour
 {
+        public Injection[] injections;
         [CSharpCallLua]
         public delegate void LuaObjectAction(object lauObject, params object[] args);
         public string luaScript;
         private LuaObjectAction  luaStart;
         private LuaObjectAction  luaUpdate;
         private LuaObjectAction  luaOnDestroy;
-
+        
         private LuaTable scriptEnv;
 
         private LuaEnv luaEnv
@@ -24,11 +32,7 @@ public class XLuaBehaviour : MonoBehaviour
         }
         void Awake()
         {
-
-            
             // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
-            
-
             object[] obj =  luaEnv.DoString(FileUtils.ReadFileContent(luaScript) , luaScript);
             if (obj !=null && obj.Length >0)
             {
@@ -39,16 +43,11 @@ public class XLuaBehaviour : MonoBehaviour
             {
                 return;
             }
-            print(obj.Length);
-            var data = scriptEnv.GetInPath<LuaTable>("data");
-
-            var result = LuaConvert.ConvertToObject(data);
-            var ret = MessagePackSerializer.ToJson(result);
-            print(ret);
-
-            var body = MessagePackSerializer.FromJson(ret);
+            foreach (var injection in injections)
+            {
+                scriptEnv.Set(injection.name, injection.value);
+            }
             
-            LogTool.Instance.ToStringAll(body);
             //            Action luaAwake = scriptEnv.Get<Action>("awake");
             scriptEnv.Get("start",out luaStart);
             scriptEnv.Get("update", out luaUpdate);

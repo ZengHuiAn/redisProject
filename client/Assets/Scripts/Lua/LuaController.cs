@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using NetLib;
 using UnityEngine;
 using XLua;
 
@@ -39,6 +40,8 @@ public class LuaController : MonoBehaviour
         
         L.Global.Set<string,Action<string,Action<object>>>("RegisterEvent",EventManager.Instance.AddEventAction);
 
+        L.Global.Set<string,RPCManager>("RPCInstance",RPCManager.Instance);
+        
         var MainAction = L.Global.Get<System.Action>("main");
         if (MainAction != null)
         {

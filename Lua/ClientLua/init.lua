@@ -1,6 +1,8 @@
 print("init--------->>>>")
 print("----->>>>")
 local timer = 10
+
+
 function main()
     --setmetatable(_G, {__index=function(_, k)
     --    print("GLOBAL NAME:".. k, "NOT EXISTS",debug.traceback())
@@ -18,7 +20,7 @@ end
 
 lua_class = require("class")
 
-
+require("Tools.utils")
 
 
 -- 打印表的格式的方法

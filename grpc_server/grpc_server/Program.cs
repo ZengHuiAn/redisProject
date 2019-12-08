@@ -13,7 +13,7 @@ namespace Server
             const int Port = 50051;
             Grpc.Core.Server server = new Grpc.Core.Server
             {
-                Services = { User.BindService(new UserImpl()) },
+                Services = { NetLib.CommonUser.RPC_User.BindService(new UserImpl()) },
                 Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) },
             };
             

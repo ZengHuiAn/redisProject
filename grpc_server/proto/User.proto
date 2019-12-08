@@ -1,20 +1,22 @@
 syntax = "proto3";
 
-package NetLib;
+package NetLib.CommonUser;
 
 
 // The greeting service definition.
-service User {
+service RPC_User {
     // Sends a greeting
-    rpc SayHello (UserRequest) returns (UserReply) {}
+    rpc CreateUser (UserRequest) returns (UserReply) {}
 }
 
 // The request message containing the user's name.
 message UserRequest {
     string name = 1;
+    string passwd = 2;
 }
 
 // The response message containing the greetings
 message UserReply {
-    string message = 1;
+    string error_code = 1;
+    string uuid = 2;
 }

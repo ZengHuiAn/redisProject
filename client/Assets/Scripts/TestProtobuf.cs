@@ -5,19 +5,19 @@ using Grpc.Core;
 using Google.Protobuf;
 using  System;
 using NetLib;
+using NetLib.CommonUser;
 
 public class TestProtobuf : MonoBehaviour
 {
-    private Channel channel;
+    
     // Start is called before the first frame update
     void Start()
     {
-         channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
-        var client = new User.UserClient(channel);
-
-        var reply = client.SayHello(new UserRequest() {Name = "123456"});
+        RPCManager.Instance.Connect("127.0.0.1:50051");
+        var request = new UserRequest() {Name = "123456"};
+        var reply =  RPCManager.Instance.Protocol_CreateUser(request);
         
-        Debug.Log("Greeting: " + reply.Message);
+        Debug.Log(reply);
 
 
         
@@ -33,6 +33,6 @@ public class TestProtobuf : MonoBehaviour
 
     private void OnDestroy()
     {
-        channel.ShutdownAsync().Wait();
+        RPCManager.Instance.Dispose();
     }
 }
