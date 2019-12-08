@@ -1,5 +1,5 @@
 ﻿using System;
-using Common;
+using NetLib;
 using Grpc.Core;
 using Server.UserLogic;
 
@@ -13,7 +13,7 @@ namespace Server
             const int Port = 50051;
             Grpc.Core.Server server = new Grpc.Core.Server
             {
-                Services = { Common.User.BindService(new UserImpl()) },
+                Services = { User.BindService(new UserImpl()) },
                 Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) },
             };
             

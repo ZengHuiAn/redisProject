@@ -1,6 +1,6 @@
 ﻿using System;
 using Grpc.Core;
-using Common;
+using NetLib;
 namespace NetClient
 {
     class Program

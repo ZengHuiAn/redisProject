@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common;
+using NetLib;
 using Grpc.Core;
 
 namespace Server.UserLogic
 {
-    public class UserImpl : Common.User.UserBase
+    public class UserImpl : NetLib.User.UserBase
     {
         public override Task<UserReply> SayHello(UserRequest request, ServerCallContext context)
         {
