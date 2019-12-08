@@ -1342,8 +1342,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1723638775}
-  - component: {fileID: 1723638776}
   - component: {fileID: 1723638777}
+  - component: {fileID: 1723638776}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -1374,11 +1374,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1723638774}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6857c0c81e5d8f242b2d145d3c2cd003, type: 3}
+  m_Script: {fileID: 11500000, guid: 7108a0ca1e5b685478f83f05f6b536c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  server_ip: 127.0.0.1
-  port: 10000
 --- !u!114 &1723638777
 MonoBehaviour:
   m_ObjectHideFlags: 0
