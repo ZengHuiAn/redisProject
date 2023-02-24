@@ -8,5 +8,6 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/micro/go-micro v1.16.0
 	github.com/miekg/dns v1.1.22 // indirect
-	golang.org/x/net v0.0.0-20191028085509-fe3aa8a45271 // indirect
+	github.com/ugorji/go/codec v1.1.7
+	golang.org/x/net v0.7.0 // indirect
 )
